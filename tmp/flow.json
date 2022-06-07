@@ -1,0 +1,829 @@
+[
+    {
+        "id": "deb28b7a288d8b36",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "12f05c86cd2e85fa",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": "8086",
+        "protocol": "http",
+        "database": "current_voltage",
+        "name": "",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "1.x",
+        "url": "http://localhost:8086",
+        "rejectUnauthorized": true
+    },
+    {
+        "id": "be22eed25dace4c9",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "test.mosquitto.org",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "b44d01eec1fa8a6a",
+        "type": "mqtt in",
+        "z": "deb28b7a288d8b36",
+        "name": "",
+        "topic": "ourSensorOut",
+        "qos": "2",
+        "datatype": "utf8",
+        "broker": "be22eed25dace4c9",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 130,
+        "y": 260,
+        "wires": [
+            [
+                "a9b258ac9de24107",
+                "dec96b3bb1db8510",
+                "ccf06de957d23a62"
+            ]
+        ]
+    },
+    {
+        "id": "36a0dbf57939f7ef",
+        "type": "influxdb out",
+        "z": "deb28b7a288d8b36",
+        "influxdb": "12f05c86cd2e85fa",
+        "name": "",
+        "measurement": "current",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "current_voltage",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "organisation",
+        "bucket": "bucket",
+        "x": 590,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "44c30049893a61e5",
+        "type": "influxdb out",
+        "z": "deb28b7a288d8b36",
+        "influxdb": "12f05c86cd2e85fa",
+        "name": "",
+        "measurement": "voltage",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "current_voltage",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "organisation",
+        "bucket": "bucket",
+        "x": 590,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "114c767218016e15",
+        "type": "influxdb in",
+        "z": "deb28b7a288d8b36",
+        "influxdb": "12f05c86cd2e85fa",
+        "name": "current last 1m",
+        "query": "select * from current where time > now() - 1m",
+        "rawOutput": false,
+        "precision": "",
+        "retentionPolicy": "",
+        "org": "organisation",
+        "x": 140,
+        "y": 560,
+        "wires": [
+            [
+                "301837f9c58124a2"
+            ]
+        ]
+    },
+    {
+        "id": "301837f9c58124a2",
+        "type": "function",
+        "z": "deb28b7a288d8b36",
+        "name": "last()",
+        "func": "var data = msg.payload;\nvar len = data.length;\n\nvar last = parseFloat(data[len-1][\"value\"]);\n\nmsg.topic = \"last\";\nmsg.payload = last;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 560,
+        "wires": [
+            [
+                "34cececa08342613"
+            ]
+        ]
+    },
+    {
+        "id": "a9b258ac9de24107",
+        "type": "function",
+        "z": "deb28b7a288d8b36",
+        "name": "get_current()",
+        "func": "var data = msg.payload;\nvar arrData = data.split(',');\nvar current = arrData[0];\n\nmsg.payload = current;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 260,
+        "wires": [
+            [
+                "36a0dbf57939f7ef"
+            ]
+        ]
+    },
+    {
+        "id": "dec96b3bb1db8510",
+        "type": "function",
+        "z": "deb28b7a288d8b36",
+        "name": "get_voltage()",
+        "func": "var data = msg.payload;\nvar arrData = data.split(',');\nvar voltage = arrData[1];\n\nmsg.payload = voltage;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 300,
+        "wires": [
+            [
+                "44c30049893a61e5"
+            ]
+        ]
+    },
+    {
+        "id": "02265fb8e7f19646",
+        "type": "comment",
+        "z": "deb28b7a288d8b36",
+        "name": "MQTT to InfluxDB",
+        "info": "Get data from esp via mqtt\nThen, upload it to DB",
+        "x": 150,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "3e1b261aa202bea4",
+        "type": "debug",
+        "z": "deb28b7a288d8b36",
+        "d": true,
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 350,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "ccf06de957d23a62",
+        "type": "debug",
+        "z": "deb28b7a288d8b36",
+        "d": true,
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 310,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "58e25a9c020b304f",
+        "type": "influxdb out",
+        "z": "deb28b7a288d8b36",
+        "influxdb": "12f05c86cd2e85fa",
+        "name": "",
+        "measurement": "performance",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "current_voltage",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "organisation",
+        "bucket": "bucket",
+        "x": 470,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "d854145ff731b37e",
+        "type": "influxdb in",
+        "z": "deb28b7a288d8b36",
+        "influxdb": "12f05c86cd2e85fa",
+        "name": "current all",
+        "query": "select * from current where time >= '2022-06-07 00:00:00' and time < '2022-06-08 00:00:00'",
+        "rawOutput": false,
+        "precision": "",
+        "retentionPolicy": "",
+        "org": "organisation",
+        "x": 120,
+        "y": 520,
+        "wires": [
+            [
+                "fcd8a85aae64fc10"
+            ]
+        ]
+    },
+    {
+        "id": "fcd8a85aae64fc10",
+        "type": "function",
+        "z": "deb28b7a288d8b36",
+        "name": "max()",
+        "func": "var data = msg.payload;\nvar len = data.length;\nvar max = 0;\n\nfor (var i=0; i<len; i++) {\n    if (data[i][\"value\"] > max) {\n        max = parseFloat( data[i][\"value\"] );\n    }\n}\n\nmsg.topic = \"max\";\nmsg.payload = max;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 520,
+        "wires": [
+            [
+                "34cececa08342613"
+            ]
+        ]
+    },
+    {
+        "id": "34cececa08342613",
+        "type": "join",
+        "z": "deb28b7a288d8b36",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "2",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 450,
+        "y": 540,
+        "wires": [
+            [
+                "ee9325c2fc6bc0fd",
+                "ab5ace579765244f"
+            ]
+        ]
+    },
+    {
+        "id": "ee9325c2fc6bc0fd",
+        "type": "function",
+        "z": "deb28b7a288d8b36",
+        "name": "get_performance()",
+        "func": "// object\n// last: 7\n// max: 7.4\n\nvar data = msg.payload;\nvar performance = data[\"last\"]/data[\"max\"]*100;\n\nmsg.topic = \"performance\";\nmsg.payload = performance;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 150,
+        "y": 620,
+        "wires": [
+            [
+                "3e1b261aa202bea4",
+                "58e25a9c020b304f",
+                "b73e8c5b4ba2e0d3"
+            ]
+        ]
+    },
+    {
+        "id": "ed0775f26399917e",
+        "type": "inject",
+        "z": "deb28b7a288d8b36",
+        "name": "interval 5s",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 460,
+        "wires": [
+            [
+                "d854145ff731b37e",
+                "114c767218016e15"
+            ]
+        ]
+    },
+    {
+        "id": "f6d4b2fa05311d9b",
+        "type": "comment",
+        "z": "deb28b7a288d8b36",
+        "name": "Calculate Performance",
+        "info": "Compare current device condition by in new condition.",
+        "x": 160,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "c8b0e3c229f1c7e2",
+        "type": "comment",
+        "z": "deb28b7a288d8b36",
+        "name": "Check Fluctuation",
+        "info": "",
+        "x": 150,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "63b86ca8a7d51d86",
+        "type": "function",
+        "z": "deb28b7a288d8b36",
+        "name": "avg()",
+        "func": "var data = msg.payload;\nvar len = data.length;\nvar sum = 0;\n\nfor (let i=0; i<len; i++) {\n    sum += parseFloat( data[i][\"value\"] );\n}\n\nvar avg = sum/len;\n\nmsg.topic = 'avg';\nmsg.payload = avg;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 840,
+        "wires": [
+            [
+                "ec90d61910589119"
+            ]
+        ]
+    },
+    {
+        "id": "b08725a6e5fcb164",
+        "type": "debug",
+        "z": "deb28b7a288d8b36",
+        "d": true,
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 590,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "ab5ace579765244f",
+        "type": "debug",
+        "z": "deb28b7a288d8b36",
+        "d": true,
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 610,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "44ef5071fbe4038b",
+        "type": "influxdb in",
+        "z": "deb28b7a288d8b36",
+        "influxdb": "12f05c86cd2e85fa",
+        "name": "current last 1m",
+        "query": "select * from current where time > now() - 1m",
+        "rawOutput": false,
+        "precision": "",
+        "retentionPolicy": "",
+        "org": "organisation",
+        "x": 140,
+        "y": 860,
+        "wires": [
+            [
+                "63b86ca8a7d51d86",
+                "243f454112c76039"
+            ]
+        ]
+    },
+    {
+        "id": "c8fc5fa5b2447a46",
+        "type": "inject",
+        "z": "deb28b7a288d8b36",
+        "name": "interval 5s",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 820,
+        "wires": [
+            [
+                "44ef5071fbe4038b"
+            ]
+        ]
+    },
+    {
+        "id": "243f454112c76039",
+        "type": "function",
+        "z": "deb28b7a288d8b36",
+        "name": "last()",
+        "func": "var data = msg.payload;\nvar len = data.length;\n\nvar last = parseFloat(data[len-1][\"value\"]);\n\nmsg.topic = \"last\";\nmsg.payload = last;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 880,
+        "wires": [
+            [
+                "ec90d61910589119"
+            ]
+        ]
+    },
+    {
+        "id": "ec90d61910589119",
+        "type": "join",
+        "z": "deb28b7a288d8b36",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "2",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 430,
+        "y": 860,
+        "wires": [
+            [
+                "b08725a6e5fcb164",
+                "cddf1a65bd8780f2"
+            ]
+        ]
+    },
+    {
+        "id": "cddf1a65bd8780f2",
+        "type": "function",
+        "z": "deb28b7a288d8b36",
+        "name": "get_fluctuation()",
+        "func": "//{ \"avg\": 6.233333333333334, \"last\": 6.1 }\n\nvar data = msg.payload;\nvar delta = Math.abs( data[\"last\"] - data[\"avg\"] );\nvar fluc = delta/data[\"avg\"]*100;   // in percent\n\nmsg.topic = \"fluctuation\";\nmsg.payload = fluc;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 140,
+        "y": 940,
+        "wires": [
+            [
+                "999baf76418b1c07",
+                "d390cb84ed498e37"
+            ]
+        ]
+    },
+    {
+        "id": "1bf55108323918a4",
+        "type": "join",
+        "z": "deb28b7a288d8b36",
+        "name": "",
+        "mode": "custom",
+        "build": "object",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "2",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 170,
+        "y": 1120,
+        "wires": [
+            [
+                "5a0d7c3c23c643b1",
+                "bb195c84a6513ff2"
+            ]
+        ]
+    },
+    {
+        "id": "b73e8c5b4ba2e0d3",
+        "type": "link out",
+        "z": "deb28b7a288d8b36",
+        "name": "",
+        "mode": "link",
+        "links": [
+            "222403c25c0301d9"
+        ],
+        "x": 295,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "222403c25c0301d9",
+        "type": "link in",
+        "z": "deb28b7a288d8b36",
+        "name": "",
+        "links": [
+            "999baf76418b1c07",
+            "b73e8c5b4ba2e0d3"
+        ],
+        "x": 75,
+        "y": 1120,
+        "wires": [
+            [
+                "1bf55108323918a4"
+            ]
+        ]
+    },
+    {
+        "id": "999baf76418b1c07",
+        "type": "link out",
+        "z": "deb28b7a288d8b36",
+        "name": "",
+        "mode": "link",
+        "links": [
+            "222403c25c0301d9"
+        ],
+        "x": 275,
+        "y": 980,
+        "wires": []
+    },
+    {
+        "id": "26610595df6d97f7",
+        "type": "comment",
+        "z": "deb28b7a288d8b36",
+        "name": "Control Indicator",
+        "info": "Refer to PERFORMANCE and FLUCTUATION",
+        "x": 140,
+        "y": 1080,
+        "wires": []
+    },
+    {
+        "id": "d390cb84ed498e37",
+        "type": "debug",
+        "z": "deb28b7a288d8b36",
+        "d": true,
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 330,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "5a0d7c3c23c643b1",
+        "type": "debug",
+        "z": "deb28b7a288d8b36",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 190,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "c576e939d5d9027a",
+        "type": "debug",
+        "z": "deb28b7a288d8b36",
+        "name": "flag",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 610,
+        "y": 1280,
+        "wires": []
+    },
+    {
+        "id": "bbc7b6ad645aafe8",
+        "type": "function",
+        "z": "deb28b7a288d8b36",
+        "name": "get_flag()",
+        "func": "var data = msg.payload;\n\nvar flag = data;\n\nmsg.payload = flag;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 1220,
+        "wires": [
+            [
+                "c576e939d5d9027a",
+                "912610df64b46dba"
+            ]
+        ]
+    },
+    {
+        "id": "912610df64b46dba",
+        "type": "mqtt out",
+        "z": "deb28b7a288d8b36",
+        "name": "",
+        "topic": "ourSensorIn",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "be22eed25dace4c9",
+        "x": 630,
+        "y": 1220,
+        "wires": []
+    },
+    {
+        "id": "6ec45b48454560b6",
+        "type": "debug",
+        "z": "deb28b7a288d8b36",
+        "d": true,
+        "name": "return",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 310,
+        "y": 1300,
+        "wires": []
+    },
+    {
+        "id": "bb195c84a6513ff2",
+        "type": "file",
+        "z": "deb28b7a288d8b36",
+        "name": "write param.json",
+        "filename": "/home/ma-pi/_myProjects/monitoring-current-voltage/tmp/param.json",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 400,
+        "y": 1120,
+        "wires": [
+            [
+                "651566ae4d63a16a"
+            ]
+        ]
+    },
+    {
+        "id": "651566ae4d63a16a",
+        "type": "exec",
+        "z": "deb28b7a288d8b36",
+        "command": "cd && cd /home/ma-pi/_myProjects/monitoring-current-voltage/src/ && python control_indicator.py && cd",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "control_indicator.py",
+        "x": 150,
+        "y": 1260,
+        "wires": [
+            [
+                "da127c69401a4f65",
+                "bbc7b6ad645aafe8"
+            ],
+            [
+                "d84ad4626b81badb"
+            ],
+            [
+                "6ec45b48454560b6"
+            ]
+        ]
+    },
+    {
+        "id": "da127c69401a4f65",
+        "type": "debug",
+        "z": "deb28b7a288d8b36",
+        "d": true,
+        "name": "stdout",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 310,
+        "y": 1220,
+        "wires": []
+    },
+    {
+        "id": "d84ad4626b81badb",
+        "type": "debug",
+        "z": "deb28b7a288d8b36",
+        "name": "error",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 310,
+        "y": 1260,
+        "wires": []
+    }
+]
