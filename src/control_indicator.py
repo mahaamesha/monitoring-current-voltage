@@ -75,18 +75,17 @@ def determine_flag(level_obj={}):
 def main():
     # Read msg.payload
     result = read_payload()
-    print(result)
 
-    # # Read limit.json
-    # limit = load_json_obj(file_path="tmp/limit.json")
+    # Read limit.json
+    limit = load_json_obj(file_path="tmp/limit.json")
 
-    # level = {"performance": 0, "fluctuation": 0}
-    # level["performance"] = check_performance_level(result_obj=result, limit_obj=limit)
-    # level["fluctuation"] = check_fluctuation_level(result_obj=result, limit_obj=limit)
-    # if isPrint: print(level)
+    level = {"performance": 0, "fluctuation": 0}
+    level["performance"] = check_performance_level(result_obj=result, limit_obj=limit)
+    level["fluctuation"] = check_fluctuation_level(result_obj=result, limit_obj=limit)
+    if isPrint: print(level)
 
-    # flag = determine_flag(level_obj=level)
-    # print(flag)
+    flag = determine_flag(level_obj=level)
+    print(flag)
 
 
 if __name__ == "__main__":
