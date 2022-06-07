@@ -85,7 +85,7 @@ def main():
     if isPrint: print(level)
 
     flag = determine_flag(level_obj=level)
-    print(flag)
+    print(str(flag))
 
 
 if __name__ == "__main__":
