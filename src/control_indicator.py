@@ -84,8 +84,6 @@ def determine_flag(level_obj={}):
 def main():
     # Read msg.payload
     result = read_payload()
-    result = load_paramjson(file_path="tmp/param.json")
-    print(result)
 
     # Read limit.json
     limit = load_json_obj(file_path="tmp/limit.json")
