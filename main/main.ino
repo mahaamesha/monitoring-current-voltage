@@ -42,6 +42,7 @@ void read_ina219(param *p) {  // struct param
 }
 
 void print_ina219(param *p) {
+	Serial.println();
 	Serial.println("=== Measurement ===");
 	Serial.print("Vsh\t: ");
 	Serial.print((*p).shuntvoltage);
@@ -66,18 +67,18 @@ void print_ina219(param *p) {
 }
 
 // check flag, then turn on/off led
-void control_led(int flag) {
-	if (flag == 0) {
+void control_led(String flag) {
+	if (flag == "0") {
 		digitalWrite(LED_RED, LOW);
 		digitalWrite(LED_YLW, LOW);
 		digitalWrite(LED_GRN, HIGH);
 	}
-	else if (flag == 1) {
+	else if (flag == "1") {
 		digitalWrite(LED_RED, LOW);
 		digitalWrite(LED_YLW, HIGH);
 		digitalWrite(LED_GRN, LOW);
 	}
-	else if (flag == 2) {
+	else if (flag == "2") {
 		digitalWrite(LED_RED, HIGH);
 		digitalWrite(LED_YLW, LOW);
 		digitalWrite(LED_GRN, LOW);
@@ -119,7 +120,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 
 	// Check if I should turn on/off the actuator
 	if (String(topic) == String("ourSensorIn")) {
-		int flag = (char)payload[0];	// It can be 0,1,2
+		String flag = String( (char)payload[0] );	// It can be 0,1,2
 		control_led(flag);	//0:green, 1:yellow, 2:red
 	}
 	else {
@@ -155,7 +156,7 @@ void reconnect() {
 
 
 void setup() {
-	Serial.begin(115200);
+	Serial.begin(9600);
 	
 	// For mqtt
 	setup_wifi();
