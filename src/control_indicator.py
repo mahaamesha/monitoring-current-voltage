@@ -3,15 +3,13 @@
 
 import sys, os, json
 
-from sympy import limit
-
 def read_payload():
     # Read msg.payload as dictionary {"performance": FLOAT, "fluctuation": FLOAT}
     try: 
         obj = sys.argv[1]
     except: 
-        obj = {"performance": 91, "fluctuation": 15}   # only for test
-        print("Error: Can't read msg.payload in nodered")
+        obj = {"performance": 91, "fluctuation": 4}   # only for test
+        #print("Error: Can't read msg.payload in nodered")
     
     return obj
 
@@ -39,7 +37,7 @@ def check_performance_level(result_obj={}, limit_obj={}, key="performance"):
 
         if (value >= lower and value <= upper):
             msg = key + " = " + str(value) + " in [" + str(lower) + ", " + str(upper) + "]"
-            print(msg)
+            # print(msg)
             return level
         
         level -= 1
@@ -55,7 +53,7 @@ def check_fluctuation_level(result_obj={}, limit_obj={}, key="fluctuation"):
 
         if (value >= lower and value <= upper):
             msg = key + " = " + str(value) + " in [" + str(lower) + ", " + str(upper) + "]"
-            print(msg)
+            # print(msg)
             return level
         
         level += 1      # the difference beetwen check_performance_level is in here
@@ -82,7 +80,7 @@ def main():
     level = {"performance": 0, "fluctuation": 0}
     level["performance"] = check_performance_level(result_obj=result, limit_obj=limit)
     level["fluctuation"] = check_fluctuation_level(result_obj=result, limit_obj=limit)
-    print(level)
+    # print(level)
 
     flag = determine_flag(level_obj=level)
     print(flag)
