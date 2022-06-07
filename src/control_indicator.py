@@ -5,6 +5,26 @@ import sys, os, json
 
 isPrint = False
 
+def load_paramjson(file_path="tmp/param.json"):
+    working_path = os.path.dirname(__file__)
+    project_path = os.path.join(working_path, "../")
+    path = os.path.join(project_path, file_path)
+    with open(path, "r") as f:
+        data = json.load(f)     # {'fluctuation': 1.823281907433354, 'performance': 89.74358974358975}
+    
+    return data
+
+
+def read_payload():
+    # Read msg.payload as dictionary {"performance": FLOAT, "fluctuation": FLOAT}
+    try: 
+        obj = sys.argv[1]
+    except: 
+        obj = load_paramjson(file_path="tmp/param.json")
+        if isPrint: print("Use param.json, instead of 'sys.argv[1]'")
+    
+    return obj
+
 
 def load_json_obj(file_path="tmp/filename.json"):
     working_path = os.path.dirname(__file__)
@@ -16,18 +36,6 @@ def load_json_obj(file_path="tmp/filename.json"):
             data = val      # threshold data --> {'performance': [], 'fluctuation': []}
     
     return data     # {'performance': [], 'fluctuation': []}
-
-
-def read_payload():
-    # Read msg.payload as dictionary {"performance": FLOAT, "fluctuation": FLOAT}
-    try: 
-        obj = sys.argv[1]
-    except: 
-        obj = {"performance": 91, "fluctuation": 4}   # only for test
-        load_json_obj("tmp/param.json")
-        if isPrint: print("Error: Can't read msg.payload in nodered")
-    
-    return obj
 
 
 # Compare two objects in "performance" & "fluctuation" keys
@@ -76,6 +84,8 @@ def determine_flag(level_obj={}):
 def main():
     # Read msg.payload
     result = read_payload()
+    result = load_paramjson(file_path="tmp/param.json")
+    print(result)
 
     # Read limit.json
     limit = load_json_obj(file_path="tmp/limit.json")
