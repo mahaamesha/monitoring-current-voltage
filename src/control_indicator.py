@@ -5,21 +5,10 @@ import sys, os, json
 
 isPrint = False
 
-def read_payload():
-    # Read msg.payload as dictionary {"performance": FLOAT, "fluctuation": FLOAT}
-    try: 
-        obj = sys.argv[1]
-    except: 
-        obj = {"performance": 91, "fluctuation": 4}   # only for test
-        if isPrint: print("Error: Can't read msg.payload in nodered")
-    
-    return obj
-
 
 def load_json_obj(file_path="tmp/filename.json"):
     working_path = os.path.dirname(__file__)
     project_path = os.path.join(working_path, "../")
-
     path = os.path.join(project_path, file_path)
     with open(path, "r") as f:
         data = json.load(f)     # {'limit': {'performance': [], 'fluctuation': []}}
@@ -27,6 +16,18 @@ def load_json_obj(file_path="tmp/filename.json"):
             data = val      # threshold data --> {'performance': [], 'fluctuation': []}
     
     return data     # {'performance': [], 'fluctuation': []}
+
+
+def read_payload():
+    # Read msg.payload as dictionary {"performance": FLOAT, "fluctuation": FLOAT}
+    try: 
+        obj = sys.argv[1]
+    except: 
+        obj = {"performance": 91, "fluctuation": 4}   # only for test
+        load_json_obj("tmp/param.json")
+        if isPrint: print("Error: Can't read msg.payload in nodered")
+    
+    return obj
 
 
 # Compare two objects in "performance" & "fluctuation" keys
