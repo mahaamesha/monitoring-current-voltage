@@ -1,8 +1,15 @@
 # monitoring-current-voltage
+by @mahaamesha
+
+<br/>
 
 ## Contents <a name='contents'></a>
 - [About](#about)
 - [Nodered](#nodered)
+- [Grafana](#grafana)
+
+<br/>
+<br/>
 
 ## About <a name='about'></a>
 **Goal**:\
@@ -34,7 +41,27 @@ Device health monitoring system by current and voltage measurement
 - Server will send the `flag` as `String`. Then, ESP8266 will receive it and control the indicator.
 - Visualization using Grafana. Email will be send to `receiver_email` if the performance is in level 1 until 5 minutes or more.
 
-
+<br/>
+<br/>
 
 ## Nodered <a name='nodered'></a>
-- Flow
+- Flow in **nodered**:
+    > Backup of the flow is in [`flow.json`](./tmp/flow.json)
+
+    <img width="75%" src="./img/node1.jpg">
+    <img width="75%" src="./img/node2.jpg">
+    <img width="75%" src="./img/node3.jpg">
+    <img width="75%" src="./img/node4.jpg">
+
+<br/>
+<br/>
+
+## Grafana <a name='grafana'></a>
+- Visualization in **grafana**:
+    > Backup of the dashboard is in [`dashboard.json`](./tmp/dashboard.json)
+
+    <img width="75%" src="./img/grafana1.jpg">
+
+<br/>
+<br/>
+
