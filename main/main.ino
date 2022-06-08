@@ -10,10 +10,10 @@ int LED_YLW = 12;   // D6
 int LED_GRN = 13;   // D7
 
 // Update these with values suitable for your network.
-// const char* ssid = "Wi-Fe";
-// const char* password = "gorill4a";
-const char* ssid = "Sembilan Satu";
-const char* password = "sembilan";
+const char* ssid = "Wi-Fu";
+const char* password = "gorill4a";
+// const char* ssid = "Sembilan Satu";
+// const char* password = "sembilan";
 const char* mqtt_server = "test.mosquitto.org";
 
 WiFiClient espClient;
